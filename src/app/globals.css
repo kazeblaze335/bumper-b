@@ -1,0 +1,283 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add this to enable class-based dark mode in Tailwind v4! */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: NBInternational-Regular, Helvetica, sans-serif;
+}
+
+::view-transition-group(root) {
+  z-index: auto !important;
+}
+
+::view-transition-image-pair(root) {
+  isolation: isolate;
+  will-change: transform, opacity, scale;
+  z-index: 1;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+  animation: none !important;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: none !important;
+}
+
+/* =========================================
+   LAYOUT 4: EDITORIAL MINIMAP OVERLAYS 
+   ========================================= */
+
+/* --- OVERLAY NAVIGATION (Always Visible) --- */
+.editorial-nav {
+  position: fixed;
+  top: 2.5rem;
+  right: 3rem;
+  z-index: 9999;
+  display: flex;
+  gap: 2rem;
+  pointer-events: auto;
+}
+
+.editorial-nav button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.4);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: color 0.3s ease;
+  padding: 0;
+}
+
+.editorial-nav button.active,
+.editorial-nav button:hover {
+  color: #000;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+}
+
+/* --- THE SLEEK MINIMAP BAR --- */
+.lens-bar-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85vw;
+  height: 40vh;
+  display: flex;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+  /* Make sure there is NO background-color property here! */
+}
+
+.lens-bar-container.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Typography columns inside the white bar */
+.lens-text-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #000;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  z-index: 30;
+}
+
+.lens-text-col.right {
+  text-align: right;
+}
+
+/* Close Button Placed Below the Bar */
+.btn-close {
+  position: absolute;
+  bottom: -3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  transition: color 0.3s ease;
+}
+
+.btn-close:hover {
+  color: #000;
+}
+
+/* --- INFINITE MINIMAP STYLES --- */
+.minimap-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 40; /* Ensures it sits above your background WIDE text */
+}
+
+.project-list {
+  list-style: none;
+}
+
+.project {
+  position: absolute;
+  width: 100%;
+  height: 100svh;
+  will-change: transform;
+  overflow: hidden;
+}
+
+.minimap {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 75%;
+  height: calc(250px + 3rem);
+  background-color: blur(
+    10px
+  ) !important; /* Change this if you want the 'W' to show through! */
+  padding: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.minimap-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.minimap-img-preview {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.minimap-img-item {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  overflow: hidden;
+}
+
+.minimap-img-item img,
+.project img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.5);
+  will-change: transform;
+}
+
+.minimap-info-list {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.minimap-item-info {
+  position: absolute;
+  width: 100%;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  will-change: transform;
+}
+
+.minimap-item-info-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: -0.0125rem;
+  color: #000;
+}
+
+@media (max-width: 1000px) {
+  .minimap-img-preview {
+    left: unset;
+    right: 0rem;
+    transform: translate(0, -50%);
+  }
+  .minimap-item-info-row {
+    flex-direction: column;
+  }
+}
+
+/* --- TEXT CYCLE ANIMATION --- */
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-text-cycle {
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* Ensures the flex layout of the text columns isn't broken */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
