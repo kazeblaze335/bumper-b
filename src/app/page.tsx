@@ -9,6 +9,7 @@ import StickyHeroReveal from "@/components/sections/StickyHeroReveal";
 import SwissVideoBlock from "@/components/sections/SwissVideoBlock";
 // 1. Import our new component!
 import InfiniteParallaxHero from "@/components/sections/InfiniteParallaxHero";
+import HorizontalGLParallaxBlock from "@/components/sections/HorizontalGLParallaxBlock";
 
 export default function Home() {
   const [footerHeight, setFooterHeight] = useState(0);
@@ -61,7 +62,11 @@ export default function Home() {
                 </p>
                 <div className="hidden md:block w-1/3 h-[1px] bg-zinc-300 dark:bg-zinc-800" />
               </div>
-
+              {/* ========================================= */}
+              {/* NEW HORIZONTAL WEBGL PARALLAX BLOCK       */}
+              {/* ========================================= */}
+              <HorizontalGLParallaxBlock />
+              {/* The Swiss Video Block */}
               <SwissVideoBlock />
             </div>
 

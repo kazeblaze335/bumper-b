@@ -8,7 +8,6 @@ export const LayoutEngines = {
     scale: positions[i].scale,
     rotX: 0,
     rotY: 0,
-    isMasked: 0.0,
   }),
 
   getLayout2: (
@@ -28,7 +27,6 @@ export const LayoutEngines = {
       scale: positions[i].scale,
       rotX: velocity * 0.2,
       rotY: 0,
-      isMasked: 0.0,
     };
   },
 
@@ -50,28 +48,13 @@ export const LayoutEngines = {
       scale: THREE.MathUtils.lerp(1, 0.88, Math.abs(velocity)),
       rotX: velocity * 0.1,
       rotY: velocity * -0.4,
-      isMasked: 0.0,
     };
   },
 
-  getLayout4: (
-    i: number,
-    currentY: number,
-    spacingY: number,
-    totalHeight: number,
-  ) => {
-    let y = i * spacingY - currentY;
-    let wrappedY = (y + totalHeight / 2) % totalHeight;
-    if (wrappedY < 0) wrappedY += totalHeight;
-
-    return {
-      x: 0,
-      y: wrappedY - totalHeight / 2,
-      z: 2.5,
-      scale: 0.4, // Elegant scaling for the 40vh white bar
-      rotX: 0,
-      rotY: 0,
-      isMasked: 1.0,
-    };
+  // THE REVERTED VERTICAL ARCHIVE MATH (Finite List)
+  getLayout4: (i: number, activeProject: number, spacingY: number) => {
+    const targetY = activeProject * spacingY;
+    let y = i * spacingY - targetY;
+    return { x: 0, y: y, z: 2.5, scale: 0.4, rotX: 0, rotY: 0 };
   },
 };
