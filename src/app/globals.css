@@ -31,6 +31,11 @@ body {
   font-family: NBInternational-Regular, Helvetica, sans-serif;
 }
 
+body {
+  /* Prevents the trackpad from navigating back/forward on horizontal swipes */
+  overscroll-behavior-x: none;
+}
+
 ::view-transition-group(root) {
   z-index: auto !important;
 }

@@ -79,18 +79,19 @@ function ParallaxImage({
   const spacingX = planeWidth + (isMobile ? 0.5 : 1.5);
 
   useEffect(() => {
-    if (texture && materialRef.current) {
+    if (texture && materialRef.current && texture.image) {
       texture.colorSpace = THREE.SRGBColorSpace;
-      const img = (texture as THREE.Texture).image as
-        | { width?: number; height?: number }
-        | HTMLImageElement
-        | undefined;
-      const imgWidth =
-        img && typeof (img as any).width === "number" ? (img as any).width : 1;
-      const imgHeight =
-        img && typeof (img as any).height === "number" ? (img as any).height : 1;
-      materialRef.current.uImageResolution.set(imgWidth, imgHeight);
-      materialRef.current.uResolution.set(planeWidth, planeHeight);
+
+      const img = texture.image as HTMLImageElement;
+
+      materialRef.current.uImageResolution = new THREE.Vector2(
+        img.width,
+        img.height,
+      );
+      materialRef.current.uResolution = new THREE.Vector2(
+        planeWidth,
+        planeHeight,
+      );
     }
   }, [texture, planeWidth, planeHeight]);
 
@@ -129,9 +130,6 @@ function ParallaxImage({
   );
 }
 
-// ==========================================
-// SCENE ORCHESTRATOR
-// ==========================================
 export default function HorizontalGLParallaxScene() {
   const images = useMemo(() => {
     return Array.from(
@@ -141,25 +139,18 @@ export default function HorizontalGLParallaxScene() {
   }, []);
 
   const groupRef = useRef<THREE.Group>(null);
-  const { viewport } = useThree();
+  const { viewport, size } = useThree();
 
   useFrame(() => {
     if (!groupRef.current) return;
 
     const { horizontalGlY } = useStore.getState();
+    const pixelToWebGlRatio = viewport.height / size.height;
 
-    // 1. Calculate the conversion ratio from CSS Pixels to WebGL Units
-    const pixelToWebGlRatio = viewport.height / window.innerHeight;
+    // THE FIX: Lift the entire 3D scene up by 6% of the viewport height
+    const verticalLift = viewport.height * 0.06;
 
-    // 2. Base 5vh offset from earlier
-    const baseOffset = viewport.height * 0.05;
-
-    // 3. EXACT 23-PIXEL NUDGE
-    const precisePixelOffset = 55 * pixelToWebGlRatio;
-
-    // 4. Combine offsets for final target
-    const totalVerticalOffset = baseOffset + precisePixelOffset;
-    const targetY = -(horizontalGlY * pixelToWebGlRatio) - totalVerticalOffset;
+    const targetY = -(horizontalGlY * pixelToWebGlRatio) + verticalLift;
 
     groupRef.current.position.y = targetY;
   });

@@ -10,10 +10,103 @@ const thumbnails = Array.from(
   (_, i) => `/assets/images/image_${String(i + 1).padStart(3, "0")}.webp`,
 );
 
+// ==========================================
+// 1. ISOLATED SHADOW TRACK
+// ==========================================
+function ShadowTrack() {
+  const bgTrackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const totalProjects = thumbnails.length;
+    const totalTravelVw = (totalProjects - 1) * 80;
+
+    const unsub = useStore.subscribe((state) => {
+      if (bgTrackRef.current) {
+        bgTrackRef.current.style.transform = `translate3d(${-state.horizontalGlProgress * totalTravelVw}vw, 0, 0)`;
+      }
+    });
+    return unsub;
+  }, []);
+
+  return (
+    <div className="absolute inset-0 z-[10] flex items-center pointer-events-none opacity-20 dark:opacity-10">
+      <div
+        ref={bgTrackRef}
+        className="flex items-center will-change-transform"
+        style={{
+          paddingLeft: "15vw",
+          gap: "10vw",
+          width: `${thumbnails.length * 80 + 30}vw`,
+        }}
+      >
+        {thumbnails.map((src, i) => (
+          <div
+            key={i}
+            className="relative w-[70vw] h-[80vh] flex-shrink-0 grayscale"
+          >
+            <img src={src} alt="" className="w-full h-full object-cover" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 2. ISOLATED THUMBNAIL STRIP
+// ==========================================
+function ThumbnailStrip({
+  containerRef,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const activeProject = useStore((state) => state.activeProject);
+
+  const handleThumbnailClick = (index: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const scrollableDistance =
+      containerRef.current.scrollHeight - window.innerHeight;
+    const targetProgress = index / (thumbnails.length - 1);
+
+    const absoluteY =
+      window.scrollY + rect.top + targetProgress * scrollableDistance;
+    window.scrollTo({ top: absoluteY, behavior: "smooth" });
+  };
+
+  return (
+    // THE FIX: Pushed down to bottom-8 (md:bottom-10) for true footer alignment
+    <div className="absolute bottom-8 md:bottom-10 left-0 w-full flex justify-center items-center gap-6 z-[99] px-8 pointer-events-auto">
+      {thumbnails.map((src, i) => {
+        const isActive = i === activeProject;
+        return (
+          <button
+            key={i}
+            onClick={() => handleThumbnailClick(i)}
+            className={`relative w-16 h-10 overflow-hidden transition-all duration-300 cursor-pointer ${
+              isActive
+                ? "border-[1.5px] border-zinc-900 dark:border-zinc-100 scale-125 shadow-xl z-10"
+                : "border border-transparent opacity-40 scale-100 grayscale hover:opacity-80 hover:grayscale-0"
+            }`}
+          >
+            <img
+              src={src}
+              alt={`Thumbnail ${i}`}
+              className="w-full h-full object-cover"
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ==========================================
+// 3. MAIN STATIC LAYOUT BLOCK
+// ==========================================
 export default function HorizontalGLParallaxBlock() {
   const containerRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
-  const { activeProject, setActiveProject } = useStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,29 +124,20 @@ export default function HorizontalGLParallaxBlock() {
         totalProjects - 1,
       );
 
+      const isGalleryActive = rect.top <= 50 && rect.bottom > 100;
+
       useStore.setState({
         horizontalGlProgress: progress,
         horizontalGlY: stickyRef.current.getBoundingClientRect().top,
+        activeProject: activeIndex,
+        isHorizontalGalleryActive: isGalleryActive,
       });
-
-      setActiveProject(activeIndex);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [setActiveProject]);
-
-  const handleThumbnailClick = (index: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const scrollableDistance =
-      containerRef.current.scrollHeight - window.innerHeight;
-    const targetProgress = index / (thumbnails.length - 1);
-
-    const absoluteY =
-      window.scrollY + rect.top + targetProgress * scrollableDistance;
-    window.scrollTo({ top: absoluteY, behavior: "smooth" });
-  };
+  }, []);
 
   return (
     <section
@@ -64,39 +148,13 @@ export default function HorizontalGLParallaxBlock() {
         ref={stickyRef}
         className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-center items-center"
       >
-        {/* Editorial Typography Overlay - Grouped closer to the top */}
-        <div className="absolute top-8 left-8 md:left-16 z-[60] pointer-events-none">
-          <p className="text-zinc-500 dark:text-zinc-400 text-xs font-bold tracking-[0.2em] uppercase transition-colors duration-500"></p>
-        </div>
+        <ShadowTrack />
 
-        {/* THUMBNAIL STRIP - Grouped tighter to the text to leave massive padding below */}
-        <div className="absolute top-24 left-0 w-full flex justify-center items-center gap-6 z-[99] px-8 pointer-events-auto">
-          {thumbnails.map((src, i) => {
-            const isActive = i === activeProject;
-            return (
-              <button
-                key={i}
-                onClick={() => handleThumbnailClick(i)}
-                className={`relative w-16 h-10 overflow-hidden transition-all duration-300 cursor-pointer ${
-                  isActive
-                    ? "border-[1.5px] border-zinc-900 dark:border-zinc-100 scale-125 shadow-xl z-10"
-                    : "border border-transparent opacity-40 scale-100 grayscale hover:opacity-80 hover:grayscale-0"
-                }`}
-              >
-                <img
-                  src={src}
-                  alt={`Thumbnail ${i}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            );
-          })}
-        </div>
-
-        {/* WebGL Teleporter */}
         <tunnel.In>
           <HorizontalGLParallaxScene />
         </tunnel.In>
+
+        <ThumbnailStrip containerRef={containerRef} />
       </div>
     </section>
   );
