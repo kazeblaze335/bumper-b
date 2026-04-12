@@ -9,14 +9,9 @@ interface AppState {
   scrollProgress: number;
   setScrollProgress: (progress: number) => void;
 
-  // 3. ARCHIVE LAYOUT ENGINE STATE
-  activeLayout: string;
-  previousLayout: string;
+  // 3. GLOBAL PROJECT TRACKING
   activeProject: number;
-  galleryProgress: number; // Restored for HorizontalLensGallery
-  setActiveLayout: (layout: string) => void;
   setActiveProject: (index: number) => void;
-  setGalleryProgress: (progress: number) => void;
 
   // 4. HOMEPAGE HORIZONTAL PARALLAX STATE
   horizontalGlProgress: number;
@@ -38,17 +33,8 @@ export const useStore = create<AppState>((set) => ({
   scrollProgress: 0,
   setScrollProgress: (progress) => set({ scrollProgress: progress }),
 
-  activeLayout: "layout-1-gallery",
-  previousLayout: "layout-1-gallery",
   activeProject: 0,
-  galleryProgress: 0, // Restored
-  setActiveLayout: (layout) =>
-    set((state) => ({
-      previousLayout: state.activeLayout,
-      activeLayout: layout,
-    })),
   setActiveProject: (index) => set({ activeProject: index }),
-  setGalleryProgress: (progress) => set({ galleryProgress: progress }),
 
   horizontalGlProgress: 0,
   horizontalGlY: 0,

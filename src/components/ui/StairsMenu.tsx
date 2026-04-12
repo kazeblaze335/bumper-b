@@ -13,18 +13,17 @@ import { triggerPaperPushTransition } from "@/utils/animations";
 import React from "react";
 
 const heightAnim: Variants = {
-  initial: { height: "0vh" },
+  initial: { height: "0dvh" },
   enter: (i: number) => ({
-    height: "100vh",
+    height: "100dvh",
     transition: { duration: 0.5, delay: 0.05 * i, ease: [0.76, 0, 0.24, 1] },
   }),
   exit: (i: number) => ({
-    height: "0vh",
+    height: "0dvh",
     transition: { duration: 0.5, delay: 0.05 * i, ease: [0.76, 0, 0.24, 1] },
   }),
 };
 
-// Cleaned up the core animation object to natively use -120% for the exit!
 const charAnim: Variants = {
   initial: { y: "100%" },
   enter: (i: number) => ({
@@ -36,7 +35,7 @@ const charAnim: Variants = {
     },
   }),
   exit: (i: number) => ({
-    y: "-120%", // Increased target guarantees it clears the tighter top mask
+    y: "-120%",
     opacity: 0,
     transition: { duration: 0.3, delay: i * 0.01, ease: [0.76, 0, 0.24, 1] },
   }),
@@ -51,7 +50,7 @@ const opacityAnim: Variants = {
 const NAV_LINKS = [
   { title: "Home", href: "/" },
   { title: "Projects", href: "/work" },
-  { title: "Agency", href: "/about" },
+  { title: "About", href: "/about" },
 ];
 
 export default function StairsMenu({
@@ -64,7 +63,6 @@ export default function StairsMenu({
   const router = useTransitionRouter();
   const pathname = usePathname();
 
-  // --- MAGNETIC CURSOR LOGIC FOR CLOSE BUTTON ---
   const closeX = useMotionValue(0);
   const closeY = useMotionValue(0);
 
@@ -91,7 +89,6 @@ export default function StairsMenu({
     closeX.set(0);
     closeY.set(0);
   };
-  // ----------------------------------------------
 
   const handleNavigation =
     (path: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -111,7 +108,7 @@ export default function StairsMenu({
   return (
     <AnimatePresence mode="wait">
       {isOpen && (
-        <div className="fixed inset-0 z-[100] pointer-events-none flex flex-col justify-between">
+        <div className="fixed inset-0 z-[100] h-[100dvh] pointer-events-none flex flex-col justify-between overflow-hidden">
           <div className="absolute inset-0 flex z-0">
             {[...Array(5)].map((_, i) => (
               <motion.div
@@ -121,18 +118,17 @@ export default function StairsMenu({
                 initial="initial"
                 animate="enter"
                 exit="exit"
-                className="w-1/5 h-full bg-[#CCFF00]"
+                // THE FIX: Added `origin-center scale-x-105` to force a tiny overlap and destroy sub-pixel gaps!
+                className="w-1/5 bg-[#CCFF00] origin-center scale-x-105"
               />
             ))}
           </div>
 
-          {/* THE MAGNETIC CLOSE HIT AREA */}
           <div
-            className="absolute top-0 right-0 z-10 w-48 h-48 md:w-64 md:h-64 pointer-events-auto flex items-start justify-end"
+            className="absolute top-0 right-0 z-10 w-32 h-32 md:w-64 md:h-64 pointer-events-auto flex items-start justify-end"
             onMouseMove={handleCloseMouseMove}
             onMouseLeave={handleCloseMouseLeave}
           >
-            {/* The Close Button with cursor-pointer restored */}
             <motion.button
               style={{ x: closeXSpring, y: closeYSpring }}
               variants={opacityAnim}
@@ -142,7 +138,7 @@ export default function StairsMenu({
               onClick={closeMenu}
               className="group flex flex-col items-center justify-center w-20 h-20 md:w-24 md:h-24 bg-transparent hover:scale-105 transition-transform duration-500 cursor-pointer"
             >
-              <span className="mb-2 text-xs font-bold tracking-[0.2em] uppercase leading-none hover:opacity-50 transition-opacity text-zinc-900">
+              <span className="mb-1 md:mb-2 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase leading-none hover:opacity-50 transition-opacity text-zinc-900">
                 Close
               </span>
               <svg
@@ -150,7 +146,7 @@ export default function StairsMenu({
                 height="24"
                 viewBox="0 0 68 68"
                 fill="none"
-                className="transform transition-transform group-hover:rotate-90 duration-500 text-zinc-900"
+                className="transform transition-transform group-hover:rotate-90 duration-500 text-zinc-900 w-5 h-5 md:w-6 md:h-6"
               >
                 <path
                   d="M1.5 1.5L67 67"
@@ -166,7 +162,7 @@ export default function StairsMenu({
             </motion.button>
           </div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center flex-1 pointer-events-auto text-zinc-900 gap-6 mt-24 px-12 md:px-24">
+          <div className="relative z-10 flex flex-col items-center justify-center flex-1 pointer-events-auto text-zinc-900 gap-4 md:gap-6 mt-16 md:mt-24 px-6 md:px-24">
             {NAV_LINKS.map((link, linkIndex) => {
               const staggerOffset = linkIndex * 5;
 
@@ -175,10 +171,9 @@ export default function StairsMenu({
                   key={link.title}
                   href={link.href}
                   onClick={handleNavigation(link.href)}
-                  className="group flex items-center justify-center overflow-hidden border border-transparent group-hover:border-zinc-900 px-8 md:px-16 py-4 md:py-6 relative transition-all duration-300 rounded-lg"
+                  className="group flex items-center justify-center overflow-hidden border border-transparent group-hover:border-zinc-900 px-4 md:px-16 py-3 md:py-6 relative transition-all duration-300 rounded-lg"
                 >
-                  {/* FIX: Asymmetrical mask. pt-0/pb-0 strictly hides the bottom text, -mt-4 pushes the top safety margin up */}
-                  <div className="flex overflow-hidden pt-0 pb-0 px-8 -mt-4 -mb-0 -mx-8">
+                  <div className="flex overflow-hidden pt-0 pb-0 px-4 md:px-8 -mt-2 md:-mt-4 -mb-0 -mx-4 md:-mx-8">
                     {link.title.split("").map((char, charIndex) => (
                       <motion.span
                         key={charIndex}
@@ -190,17 +185,14 @@ export default function StairsMenu({
                         className="relative inline-block"
                         style={{ whiteSpace: char === " " ? "pre" : "normal" }}
                       >
-                        {/* The Staggered Slot Machine Roll */}
                         <span
                           className="block transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full"
                           style={{ transitionDelay: `${charIndex * 0.02}s` }}
                         >
-                          {/* Top Character (Default) */}
-                          <span className="block text-6xl md:text-8xl font-black font-neue tracking-tighter uppercase leading-none pr-[0.1em]">
+                          <span className="block text-5xl md:text-8xl font-black font-neue tracking-tighter uppercase leading-none pr-[0.1em]">
                             {char}
                           </span>
-                          {/* Bottom Character (Italic & Faded) */}
-                          <span className="absolute left-0 top-full block text-6xl md:text-8xl font-black font-neue tracking-tighter uppercase leading-none pr-[0.1em] italic opacity-60">
+                          <span className="absolute left-0 top-full block text-5xl md:text-8xl font-black font-neue tracking-tighter uppercase leading-none pr-[0.1em] italic opacity-60">
                             {char}
                           </span>
                         </span>
@@ -212,7 +204,7 @@ export default function StairsMenu({
             })}
           </div>
 
-          <div className="relative z-10 w-full p-8 flex justify-center gap-8 pointer-events-auto text-zinc-900 font-bold tracking-[0.2em] uppercase text-xs">
+          <div className="relative z-10 w-full p-6 md:p-8 flex justify-center gap-6 md:gap-8 pointer-events-auto text-zinc-900 font-bold tracking-[0.2em] uppercase text-[10px] md:text-xs">
             <motion.a
               variants={opacityAnim}
               initial="initial"

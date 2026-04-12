@@ -40,14 +40,14 @@ export default function StickyHeroReveal({
   const sojuY = useTransform(motionScroll, [0, 1], ["0%", "20%"]);
 
   return (
-    <div className="h-screen w-full sticky top-0 flex flex-col items-center justify-center overflow-hidden bg-zinc-200 dark:bg-zinc-900 transition-colors duration-500 z-0 isolate transform-gpu">
+    // THE FIX: Swapped 'h-screen' for 'h-[100dvh]' so Safari's URL bar doesn't cause the layout to jump!
+    <div className="h-[100dvh] w-full sticky top-0 flex flex-col items-center justify-center overflow-hidden bg-zinc-200 dark:bg-zinc-900 transition-colors duration-500 z-0 isolate transform-gpu">
       <motion.div
         style={{
           scale: sojuScale,
           opacity: isReady ? sojuOpacity : 1,
           y: sojuY,
         }}
-        // Added font-black and ensured font-neue is present!
         className={`flex flex-row items-start justify-center text-[22vw] leading-[0.75] tracking-tight uppercase text-zinc-900 dark:text-zinc-100 font-neue font-black whitespace-nowrap`}
       >
         <ClunkyReveal key={`text-${pathname}`} text={title} delay={0.2} />
@@ -64,7 +64,6 @@ export default function StickyHeroReveal({
               damping: 12,
             }}
             style={{ transformStyle: "preserve-3d" }}
-            // Restored the 8vw size for the trademark symbol
             className="text-[8vw] align-top relative top-2 md:top-4 ml-2 inline-block"
           >
             ®

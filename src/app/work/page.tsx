@@ -117,6 +117,7 @@ export default function WorkGallery() {
           className="relative z-10"
           style={{ marginBottom: `${footerHeight}px` }}
         >
+          {/* THE FIX: Reverted back to "ARCHIVE" */}
           <StickyHeroReveal
             title="ARCHIVE"
             showTrademark={false}
@@ -159,7 +160,6 @@ export default function WorkGallery() {
                         <div
                           className={`relative w-full aspect-[3/4] overflow-hidden bg-zinc-200 dark:bg-zinc-900 mb-4 transition-transform duration-700 ${isHovered ? "scale-[0.98]" : "scale-100"}`}
                         >
-                          {/* THE FIX: Stripped the grayscale logic, keeping the image beautifully in color! */}
                           <Image
                             src={project.src}
                             alt={project.name}

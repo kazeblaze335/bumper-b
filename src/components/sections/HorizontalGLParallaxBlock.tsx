@@ -11,7 +11,7 @@ const thumbnails = Array.from(
 );
 
 // ==========================================
-// 1. ISOLATED SHADOW TRACK
+// 1. ISOLATED SHADOW TRACK (OPTIMIZED)
 // ==========================================
 function ShadowTrack() {
   const bgTrackRef = useRef<HTMLDivElement>(null);
@@ -40,11 +40,19 @@ function ShadowTrack() {
         }}
       >
         {thumbnails.map((src, i) => (
+          // THE RESPONSIVE FIX: w-[85vw] h-[50vh] on mobile, stretching back to w-[70vw] h-[80vh] on tablet/desktop
           <div
             key={i}
-            className="relative w-[70vw] h-[80vh] flex-shrink-0 grayscale"
+            className="relative w-[85vw] h-[50vh] md:w-[70vw] md:h-[80vh] flex-shrink-0 grayscale"
           >
-            <img src={src} alt="" className="w-full h-full object-cover" />
+            {/* THE PERFORMANCE FIX: Added native loading="lazy" and decoding="async" to protect the browser thread */}
+            <img
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
           </div>
         ))}
       </div>
@@ -75,7 +83,6 @@ function ThumbnailStrip({
   };
 
   return (
-    // THE FIX: Pushed down to bottom-8 (md:bottom-10) for true footer alignment
     <div className="absolute bottom-8 md:bottom-10 left-0 w-full flex justify-center items-center gap-6 z-[99] px-8 pointer-events-auto">
       {thumbnails.map((src, i) => {
         const isActive = i === activeProject;
@@ -92,6 +99,8 @@ function ThumbnailStrip({
             <img
               src={src}
               alt={`Thumbnail ${i}`}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
           </button>

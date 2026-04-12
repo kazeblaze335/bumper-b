@@ -25,8 +25,9 @@ export default function ClunkyReveal({ text, delay = 0 }: ClunkyRevealProps) {
 
   const characterVariants: Variants = {
     hidden: {
-      y: "150%",
-      rotate: 10,
+      // THE FIX: Increased from 150% to 250% to ensure massive 22vw letters fully clear the bottom mask on tall phones!
+      y: "250%",
+      rotate: 15,
     },
     visible: {
       y: "0%",
@@ -38,6 +39,11 @@ export default function ClunkyReveal({ text, delay = 0 }: ClunkyRevealProps) {
       },
     },
   };
+
+  // The perfect sweet spot
+  const kerningEm = 0.02;
+
+  const maskBleedEm = 0.3;
 
   return (
     <motion.div
@@ -51,13 +57,17 @@ export default function ClunkyReveal({ text, delay = 0 }: ClunkyRevealProps) {
           {word.split("").map((char, charIndex) => (
             <span
               key={charIndex}
-              // THE FIX: Increased pt-8/-mt-8 to pt-32/-mt-32.
-              // This gives the spring animation 128px of invisible headroom to bounce into!
-              className="inline-block overflow-hidden pt-32 pb-12 px-4 -mt-32 -mb-12 -mx-4 -mr-[0.08em]"
+              className="inline-block overflow-hidden pt-32 pb-12 -mt-32 -mb-12"
+              style={{
+                paddingLeft: `${maskBleedEm}em`,
+                paddingRight: `${maskBleedEm}em`,
+                marginLeft: `-${maskBleedEm}em`,
+                marginRight: `${-maskBleedEm + kerningEm}em`,
+              }}
             >
               <motion.span
                 variants={characterVariants}
-                className="inline-block pr-[0.08em] origin-bottom-left"
+                className="inline-block origin-bottom-left"
               >
                 {char}
               </motion.span>
