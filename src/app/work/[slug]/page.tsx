@@ -144,11 +144,10 @@ const PROJECT_DB: Record<string, any> = {
     ],
     challenge:
       "An exclusive, ephemeral digital invitation exploring themes of darkness, luxury, and brutalist typography.",
-    nextProject: { name: "Native Instruments", slug: "native-instruments" }, // Loops back!
+    nextProject: { name: "Native Instruments", slug: "native-instruments" },
   },
 };
 
-// Reusable Parallax Image Component wrapper
 function ParallaxGalleryImage({
   src,
   alt,
@@ -170,7 +169,6 @@ function ParallaxGalleryImage({
       ref={containerRef}
       className={`relative overflow-hidden bg-zinc-200 dark:bg-zinc-900 rounded-sm ${className}`}
     >
-      {/* 1.15 scale ensures we have physical room to move the image up and down without clipping */}
       <motion.div
         style={{ y, scale: 1.15 }}
         className="absolute inset-0 w-full h-full"
@@ -199,13 +197,11 @@ export default function CaseStudy({
   const [footerHeight, setFooterHeight] = useState(0);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  // Hero Parallax tracking
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
 
   const project = PROJECT_DB[slug] || PROJECT_DB["native-instruments"];
 
-  // --- FOOTER CUSTOM CURSOR LOGIC ---
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
   const cursorOpacity = useMotionValue(0);
@@ -230,7 +226,6 @@ export default function CaseStudy({
     cursorX.set(e.clientX - rect.left);
     cursorY.set(e.clientY - rect.top);
   };
-  // ----------------------------------
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -319,8 +314,8 @@ export default function CaseStudy({
             </motion.div>
           </section>
 
-          {/* THE HERO PARALLAX */}
-          <section className="w-full h-[70vh] md:h-screen mt-12 md:mt-24 overflow-hidden relative cursor-none">
+          {/* THE FIX: Replaced h-[70vh] and md:h-screen with dvh values, and disabled custom cursor on mobile */}
+          <section className="w-full h-[70dvh] md:h-[100dvh] mt-12 md:mt-24 overflow-hidden relative cursor-auto md:cursor-none">
             <motion.div
               style={{ y: heroY, scale: heroScale }}
               className="w-full h-full absolute inset-0"
@@ -335,7 +330,6 @@ export default function CaseStudy({
             </motion.div>
           </section>
 
-          {/* Challenge Text */}
           <section className="px-6 md:px-12 py-24 md:py-40 max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 relative z-10">
             <div className="md:col-span-4 flex flex-col gap-8">
               <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-zinc-400">
@@ -350,8 +344,7 @@ export default function CaseStudy({
             </div>
           </section>
 
-          {/* THE ASYMMETRICAL PARALLAX GALLERY */}
-          <section className="px-6 md:px-12 pb-32 max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 relative z-10 cursor-none">
+          <section className="px-6 md:px-12 pb-32 max-w-[1800px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-12 relative z-10 cursor-auto md:cursor-none">
             <ParallaxGalleryImage
               src={project.images[0]}
               alt="Detail 1"
@@ -369,19 +362,19 @@ export default function CaseStudy({
             />
           </section>
 
-          {/* Next Project Footer */}
+          {/* THE FIX: Replaced h-screen with h-[100dvh] */}
           <a
             href={`/work/${project.nextProject.slug}`}
             onClick={(e) => handleNavigation(e, project.nextProject.slug)}
             onMouseMove={handleFooterMouseMove}
             onMouseEnter={() => cursorOpacity.set(1)}
             onMouseLeave={() => cursorOpacity.set(0)}
-            className="relative w-full h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center overflow-hidden z-20 cursor-none block"
+            className="relative w-full h-[100dvh] bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center overflow-hidden z-20 cursor-auto md:cursor-none block"
           >
             <p className="text-[9px] font-bold tracking-[0.4em] uppercase text-zinc-500 mb-8 transition-colors hover:text-[#CCFF00]">
               Next Project
             </p>
-            <div className="group flex overflow-hidden pt-4 pb-2 px-8 -mt-4 -mb-2 -mx-8 relative z-10 cursor-none">
+            <div className="group flex overflow-hidden pt-4 pb-2 px-8 -mt-4 -mb-2 -mx-8 relative z-10 cursor-auto md:cursor-none">
               {project.nextProject.name
                 .split("")
                 .map((char: string, index: number) => (
@@ -404,6 +397,8 @@ export default function CaseStudy({
                   </span>
                 ))}
             </div>
+
+            {/* THE FIX: Added `hidden md:flex` to prevent the ghost cursor bug on mobile touchscreens */}
             <motion.div
               style={{
                 x: cursorXSpring,
@@ -412,7 +407,7 @@ export default function CaseStudy({
                 translateX: "-50%",
                 translateY: "-50%",
               }}
-              className="absolute top-0 left-0 w-32 h-32 rounded-full bg-[#CCFF00] text-zinc-900 flex items-center justify-center text-xs font-bold tracking-widest uppercase pointer-events-none z-50 mix-blend-difference"
+              className="absolute top-0 left-0 w-32 h-32 rounded-full bg-[#CCFF00] text-zinc-900 hidden md:flex items-center justify-center text-xs font-bold tracking-widest uppercase pointer-events-none z-50 mix-blend-difference"
             >
               View
             </motion.div>
